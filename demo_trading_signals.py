@@ -6,9 +6,10 @@ This doesn't require API access - uses mock data
 
 import os
 import sys
+import math
 
 # Set a dummy token to allow import
-os.environ['UPSTOX_ACCESS_TOKEN'] = 'demo_token'
+os.environ['UPSTOX_ACCESS_TOKEN'] = 'DEMO_MODE_NO_API_REQUIRED'
 
 from trading_signals import generate_signal, print_signal, Colors
 
@@ -38,7 +39,6 @@ print_signal("EXAMPLE", "Example Company Ltd.", signal, reasons)
 
 # Scenario 3: Sideways/Mixed (Consolidation)
 print(f"{Colors.BOLD}Scenario 3: Consolidating Stock{Colors.RESET}")
-import math
 sideways_closes = [200 + 10 * math.sin(i * 0.1) for i in range(250)]  # Sideways
 sideways_highs = [c + 3 for c in sideways_closes]
 sideways_lows = [c - 3 for c in sideways_closes]
