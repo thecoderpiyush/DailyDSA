@@ -13,26 +13,37 @@ The goal is to improve problem-solving skills, write clean and efficient code, a
 - `README.md` → Project documentation
 - `.gitignore` → To avoid committing unnecessary files
 - `LICENSE` → Open-source license
-- `trading_signals.py` → 📊 **NEW!** Advanced trading signal analysis tool
+- `minervini_strategy.py` → 🚀 **Minervini SEPA Breakout Scanner (RECOMMENDED)**
+- `trading_signals.py` → 📊 Legacy multi-indicator analysis tool
 
 ---
 
-## 📊 Trading Signal Analysis (NEW!)
+## 📊 Trading Strategy Tools
 
-This repository now includes a professional **Trading Signal Analysis Tool** built in Python!
+This repository includes **professional trading strategy scanners** built in Python!
 
-### Features:
-- 📈 **Real-time BUY/SELL/HOLD signals** based on multiple technical indicators
-- 🎨 **Color-coded output** (Green=BUY, Red=SELL, Yellow=HOLD)
-- 🔍 **10+ Technical Indicators** including:
-  - Moving Averages (SMA, EMA)
-  - RSI, MACD, ADX
-  - Bollinger Bands
-  - SuperTrend, Ichimoku Cloud
-- 📝 **Detailed reasoning** for each signal
-- 🎯 **Confidence scoring** based on indicator agreement
+### 🚀 Minervini SEPA Breakout Strategy (RECOMMENDED)
 
-### Quick Start:
+Based on Mark Minervini's proven method from "Trade Like a Stock Market Wizard"
+
+**Features:**
+- 📈 **Strict entry criteria** - ALL conditions must pass for BUY signal
+- 🎯 **Clear trade setup** with entry, stop-loss, and profit targets
+- 📊 **Relative Strength** analysis vs Nifty 50
+- 🔍 **Base breakout detection** with volume confirmation
+- ⚡ **Momentum filters** - only stocks ready to move
+- 💪 **Trend confirmation** - 50 EMA > 150 EMA
+
+**Strategy Components:**
+1. ✅ Price above 50 & 150 EMAs
+2. ✅ 50 EMA > 150 EMA (medium-term uptrend)
+3. ✅ RS line outperforming Nifty
+4. ✅ Base consolidation breakout
+5. ✅ Volume ≥ 1.5x average
+6. ✅ RSI 55-70 (momentum zone)
+7. ✅ Near 52-week high (within 10%)
+
+**Quick Start:**
 ```bash
 # Install dependencies
 pip install -r requirements.txt
@@ -40,14 +51,21 @@ pip install -r requirements.txt
 # Set your API token
 export UPSTOX_ACCESS_TOKEN="your_token_here"
 
-# Run the analysis
-python3 trading_signals.py
+# Run Minervini scanner
+python3 minervini_strategy.py
 
 # Or run the demo (no API needed)
-python3 demo_trading_signals.py
+python3 demo_minervini.py
 ```
 
-📚 **Full Documentation:** See [TRADING_SIGNALS_README.md](TRADING_SIGNALS_README.md)
+📚 **Full Documentation:** See [MINERVINI_STRATEGY_README.md](MINERVINI_STRATEGY_README.md)
+
+### 📊 Legacy Multi-Indicator Strategy
+
+Previous strategy using 10+ indicators with consensus-based signals. Still available but Minervini SEPA is recommended for better risk/reward.
+
+- File: `trading_signals.py`
+- Documentation: [TRADING_SIGNALS_README.md](TRADING_SIGNALS_README.md)
 
 ---
 
