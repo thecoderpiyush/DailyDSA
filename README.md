@@ -13,6 +13,41 @@ The goal is to improve problem-solving skills, write clean and efficient code, a
 - `README.md` → Project documentation
 - `.gitignore` → To avoid committing unnecessary files
 - `LICENSE` → Open-source license
+- `trading_signals.py` → 📊 **NEW!** Advanced trading signal analysis tool
+
+---
+
+## 📊 Trading Signal Analysis (NEW!)
+
+This repository now includes a professional **Trading Signal Analysis Tool** built in Python!
+
+### Features:
+- 📈 **Real-time BUY/SELL/HOLD signals** based on multiple technical indicators
+- 🎨 **Color-coded output** (Green=BUY, Red=SELL, Yellow=HOLD)
+- 🔍 **10+ Technical Indicators** including:
+  - Moving Averages (SMA, EMA)
+  - RSI, MACD, ADX
+  - Bollinger Bands
+  - SuperTrend, Ichimoku Cloud
+- 📝 **Detailed reasoning** for each signal
+- 🎯 **Confidence scoring** based on indicator agreement
+
+### Quick Start:
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Set your API token
+export UPSTOX_ACCESS_TOKEN="your_token_here"
+
+# Run the analysis
+python3 trading_signals.py
+
+# Or run the demo (no API needed)
+python3 demo_trading_signals.py
+```
+
+📚 **Full Documentation:** See [TRADING_SIGNALS_README.md](TRADING_SIGNALS_README.md)
 
 ---
 
