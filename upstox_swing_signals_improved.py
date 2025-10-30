@@ -113,12 +113,21 @@ DAILY_FETCH_BUFFER_DAYS = int(os.getenv("DAILY_FETCH_BUFFER_DAYS", "550"))
 # Rate limiting configuration
 RATE_LIMIT_CALLS = int(os.getenv("RATE_LIMIT_CALLS", "180"))  # calls per window
 RATE_LIMIT_WINDOW = float(os.getenv("RATE_LIMIT_WINDOW", "60"))  # seconds
+RATE_LIMIT_BUFFER = 0.1  # seconds added to sleep to ensure we stay under limit
 
 # Caching configuration
 ENABLE_CACHE = os.getenv("ENABLE_CACHE", "false").lower() == "true"
 CACHE_DIR = Path(os.getenv("CACHE_DIR", ".cache"))
+CACHE_EXPIRY_HOURS = int(os.getenv("CACHE_EXPIRY_HOURS", "24"))  # hours until cache expires
 if ENABLE_CACHE:
     CACHE_DIR.mkdir(exist_ok=True)
+
+# API retry configuration
+RETRY_BASE_DELAY = 0.6  # seconds base delay for exponential backoff
+RETRY_MAX_DELAY = 10.0  # seconds maximum delay cap
+
+# Data processing configuration
+DEFAULT_TRIM_SIZE = 250  # number of bars to keep for calculation window
 
 ACCESS_TOKEN = os.getenv("UPSTOX_ACCESS_TOKEN", "").strip()
 HEADERS = {
@@ -181,7 +190,7 @@ class TokenBucketRateLimiter:
         
         # If at capacity, wait for oldest call to expire
         if len(self.calls) >= self.max_calls:
-            sleep_time = self.time_window - (now - self.calls[0]) + 0.1
+            sleep_time = self.time_window - (now - self.calls[0]) + RATE_LIMIT_BUFFER
             if sleep_time > 0:
                 logger.debug(f"Rate limit reached, waiting {sleep_time:.1f}s")
                 time.sleep(sleep_time)
@@ -241,9 +250,10 @@ def load_from_cache(cache_key: str) -> Optional[Dict[str, Any]]:
     try:
         with open(cache_file, "r") as f:
             data = json.load(f)
-            # Check if cache is fresh (less than 1 day old)
+            # Check if cache is fresh (configurable expiry)
             cache_time = datetime.fromisoformat(data.get("cached_at", "2000-01-01"))
-            if (datetime.now() - cache_time).days > 1:
+            cache_age_hours = (datetime.now() - cache_time).total_seconds() / 3600
+            if cache_age_hours > CACHE_EXPIRY_HOURS:
                 return None
             metrics.cache_hits += 1
             return data.get("payload")
@@ -331,7 +341,7 @@ def fetch_candles(instrument_key: str, unit: str, interval: int, to_date: str, f
             
             if resp.status_code in (500, 502, 503, 504):
                 # Exponential backoff for server errors
-                sleep_s = min(0.6 * (2 ** attempt), 10)  # Cap at 10 seconds
+                sleep_s = min(RETRY_BASE_DELAY * (2 ** attempt), RETRY_MAX_DELAY)
                 logger.warning(f"Server error {resp.status_code} for {instrument_key}, retrying in {sleep_s:.1f}s")
                 time.sleep(sleep_s)
                 continue
@@ -405,7 +415,7 @@ def extract_ohlc_with_dt(candles: List[List[Any]]) -> Tuple[List[datetime], List
 # ------------- OPTIMIZED Indicators -------------
 def sma(series: List[float], period: int) -> Optional[float]:
     """Simple Moving Average - last value only."""
-    if len(series) < period or period <= 0:
+    if len(series) < period or period < 1:
         return None
     return sum(series[-period:]) / period
 
@@ -670,12 +680,16 @@ def validate_price_series(dts: List[datetime], highs: List[float], lows: List[fl
     return ok, msgs
 
 def have_indicator_budget(closes: List[float]) -> Tuple[bool, Dict[str, bool]]:
+    """
+    Check if we have sufficient data for all indicators.
+    BB20 needs 21 bars because bollinger_last_two() calculates both current and previous period.
+    """
     need = {
         "SMA200": len(closes) >= 200,
         "SMA50": len(closes) >= 50,
         "EMA20": len(closes) >= 20,
         "RSI14": len(closes) >= 15,
-        "BB20": len(closes) >= 21,  # Need 21 for previous calculation
+        "BB20": len(closes) >= 21,  # 21 for both current and previous BB calculation
         "ADX14": len(closes) >= 30,
         "ATR14": len(closes) >= 15,
     }
@@ -803,8 +817,8 @@ def main():
                 metrics.failed += 1
                 continue
 
-            # Trim to reasonable window
-            trim_size = max(DAILY_MIN_BARS, 250)
+            # Trim to reasonable window (use configured size or DAILY_MIN_BARS, whichever is larger)
+            trim_size = max(DAILY_MIN_BARS, DEFAULT_TRIM_SIZE)
             highs = highs[-trim_size:]
             lows = lows[-trim_size:]
             closes = closes[-trim_size:]
