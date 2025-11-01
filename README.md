@@ -8,17 +8,32 @@ The goal is to improve problem-solving skills, write clean and efficient code, a
 ---
 
 ## 📌 Repository Structure
-- `problems/` → All solved problems organized by topic (Arrays, Strings, DP, etc.)
-- `notes/` → Topic-wise learning notes, explanations, and approaches
+- `src/` → Java DSA implementations (Arrays, Stacks, Payment System, etc.)
+- `trading_strategy/` → **Python Trading Strategy Implementation** 📈
+  - Complete RSI Pullback swing trading strategy
+  - Backtesting engine with performance analysis
+  - See [trading_strategy/README.md](trading_strategy/README.md) for details
 - `README.md` → Project documentation
 - `.gitignore` → To avoid committing unnecessary files
-- `LICENSE` → Open-source license
 
 ---
 
 ## 🛠️ Tech Stack
 - **Java (Spring Boot background, DSA in Java for interviews)**
-- **Python (ML/extra practice)**
+- **Python (ML/Data Science & Trading Strategies)**
+
+---
+
+## 📈 Featured Project: RSI Pullback Trading Strategy
+
+A complete Python implementation of a professional swing trading strategy with:
+- Technical indicators (EMA, RSI, ATR)
+- Entry/Exit signal detection
+- Risk management and position sizing
+- Backtesting engine with performance metrics
+- Live signal scanner
+
+👉 **[View Trading Strategy Documentation](trading_strategy/README.md)**
 
 ---
 
